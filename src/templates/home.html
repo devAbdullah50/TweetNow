@@ -1,0 +1,415 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}
+Home | {{ block.super }}
+{% endblock title %}
+
+{% block content %}
+<style>
+    .hero-section {
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        padding: 60px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-content {
+        z-index: 2;
+        position: relative;
+    }
+    
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin-bottom: 1.5rem;
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.3rem;
+        font-weight: 300;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        line-height: 1.6;
+    }
+    
+    .hero-image {
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        transition: transform 0.3s ease;
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .hero-image:hover {
+        transform: scale(1.05) rotate(2deg);
+    }
+    
+    .cta-buttons {
+        gap: 1rem;
+    }
+    
+    .btn-cta {
+        padding: 12px 30px;
+        border-radius: 30px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .btn-primary-cta {
+        background: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-hover));
+        color: white;
+        box-shadow: 0 4px 15px rgba(29, 161, 242, 0.3);
+    }
+    
+    .btn-primary-cta:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(29, 161, 242, 0.4);
+        color: white;
+    }
+    
+    .btn-outline-cta {
+        background: transparent;
+        border: 2px solid var(--primary-blue);
+        color: var(--primary-blue);
+    }
+    
+    .btn-outline-cta:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-3px);
+    }
+    
+    .features-section {
+        padding: 80px 0;
+    }
+    
+    .feature-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: 100%;
+    }
+    
+    .feature-card:hover {
+        transform: translateY(-10px);
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-hover));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+    
+    .stats-section {
+        background: rgba(29, 161, 242, 0.1);
+        border-radius: 20px;
+        padding: 3rem;
+        margin: 4rem 0;
+        text-align: center;
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--primary-blue);
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 1rem;
+        opacity: 0.8;
+        margin-top: 0.5rem;
+    }
+    
+    .floating-elements {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 1;
+    }
+    
+    .floating-element {
+        position: absolute;
+        opacity: 0.1;
+        animation: float 6s ease-in-out infinite;
+    }
+    
+    .floating-element:nth-child(1) { top: 10%; left: 10%; animation-delay: 0s; }
+    .floating-element:nth-child(2) { top: 20%; right: 10%; animation-delay: 2s; }
+    .floating-element:nth-child(3) { bottom: 20%; left: 20%; animation-delay: 4s; }
+    .floating-element:nth-child(4) { bottom: 10%; right: 20%; animation-delay: 1s; }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+    
+    /* Dark theme specific adjustments */
+    [data-bs-theme="dark"] .feature-card {
+        background: rgba(33, 38, 45, 0.8);
+        border: 1px solid rgba(48, 54, 61, 0.5);
+    }
+    
+    [data-bs-theme="dark"] .feature-card:hover {
+        background: rgba(33, 38, 45, 0.9);
+    }
+    
+    /* Light theme specific adjustments */
+    [data-bs-theme="light"] .hero-title {
+        color: var(--light-text);
+        background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    [data-bs-theme="light"] .feature-card {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+    
+    [data-bs-theme="light"] .stats-section {
+        background: rgba(29, 161, 242, 0.05);
+        border: 1px solid rgba(29, 161, 242, 0.1);
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.5rem;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+        }
+        
+        .hero-section {
+            min-height: auto;
+            padding: 40px 0;
+        }
+        
+        .cta-buttons {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-cta {
+            width: 200px;
+            text-align: center;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <!-- Floating Background Elements -->
+    <div class="floating-elements">
+        <div class="floating-element">
+            <i class="fas fa-twitter" style="font-size: 3rem;"></i>
+        </div>
+        <div class="floating-element">
+            <i class="fas fa-heart" style="font-size: 2rem;"></i>
+        </div>
+        <div class="floating-element">
+            <i class="fas fa-retweet" style="font-size: 2.5rem;"></i>
+        </div>
+        <div class="floating-element">
+            <i class="fas fa-comment" style="font-size: 2rem;"></i>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="row align-items-center">
+            <!-- Left Content -->
+            <div class="col-lg-6 hero-content">
+                <h1 class="hero-title animate-fade-in">
+                    Welcome to
+                    <span style="display: block;">TweetNow</span>
+                </h1>
+                <p class="hero-subtitle animate-fade-in">
+                    Express yourself, connect with others, and share your thoughts with the world. 
+                    Join millions of users in conversations that matter.
+                </p>
+                
+                <!-- CTA Buttons -->
+                <div class="d-flex cta-buttons animate-fade-in">
+                    {% if user.is_authenticated %}
+                        <a href="#" class="btn btn-cta btn-primary-cta">
+                            <i class="fas fa-home me-2"></i>Go to Feed
+                        </a>
+                        <a href="{% url 'tweet:tweet_create' %}" class="btn btn-cta btn-outline-cta">
+                            <i class="fas fa-plus me-2"></i>Create Tweet
+                        </a>
+                    {% else %}
+                        <a href="{% url 'tweet:register' %}" class="btn btn-cta btn-primary-cta">
+                            <i class="fas fa-user-plus me-2"></i>Join Now
+                        </a>
+                        <a href="{% url 'login' %}" class="btn btn-cta btn-outline-cta">
+                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- User Status -->
+                {% if user.is_authenticated %}
+                    <div class="mt-4">
+                        <p class="mb-1 opacity-75">
+                            <i class="fas fa-user-check text-success me-2"></i>
+                            Welcome back, <strong>{{ user.username }}</strong>!
+                        </p>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <!-- Right Image -->
+            <div class="col-lg-6 text-center">
+                <div class="position-relative">
+                    <img class="hero-image animate-fade-in" 
+                         src="{% static 'images/homeimage.svg' %}" 
+                         alt="TweetNow Social Media Platform"
+                         style="animation-delay: 0.3s;">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="container">
+    <div class="stats-section animate-fade-in">
+        <div class="row">
+            <div class="col-md-4">
+                <span class="stat-number" data-count="10000">0</span>
+                <div class="stat-label">Active Users</div>
+            </div>
+            <div class="col-md-4">
+                <span class="stat-number" data-count="50000">0</span>
+                <div class="stat-label">Tweets Shared</div>
+            </div>
+            <div class="col-md-4">
+                <span class="stat-number" data-count="25000">0</span>
+                <div class="stat-label">Connections Made</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col-12">
+                <h2 class="display-5 fw-bold mb-3">Why Choose TweetNow?</h2>
+                <p class="lead opacity-75">Discover what makes our platform special</p>
+            </div>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h4 class="mb-3">Lightning Fast</h4>
+                    <p>Share your thoughts instantly with our optimized platform. No delays, just pure speed.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h4 class="mb-3">Connect & Engage</h4>
+                    <p>Build meaningful connections and engage in conversations that spark your interests.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="feature-card animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4 class="mb-3">Safe & Secure</h4>
+                    <p>Your privacy matters. We ensure your data is protected with top-tier security measures.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+// Animated Counter for Stats
+document.addEventListener('DOMContentLoaded', function() {
+    const counters = document.querySelectorAll('.stat-number');
+    
+    const animateCounter = (counter) => {
+        const target = parseInt(counter.getAttribute('data-count'));
+        const increment = target / 100;
+        let current = 0;
+        
+        const updateCounter = () => {
+            current += increment;
+            if (current < target) {
+                counter.textContent = Math.floor(current).toLocaleString();
+                requestAnimationFrame(updateCounter);
+            } else {
+                counter.textContent = target.toLocaleString();
+            }
+        };
+        
+        updateCounter();
+    };
+    
+    // Intersection Observer for counter animation
+    const observerOptions = {
+        threshold: 0.5,
+        rootMargin: '0px 0px -50px 0px'
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const counter = entry.target.querySelector('.stat-number');
+                if (counter && counter.textContent === '0') {
+                    animateCounter(counter);
+                }
+            }
+        });
+    }, observerOptions);
+    
+    document.querySelectorAll('.stats-section').forEach(section => {
+        observer.observe(section);
+    });
+    
+    // Staggered animation for feature cards
+    const featureCards = document.querySelectorAll('.feature-card');
+    featureCards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.2}s`;
+    });
+});
+</script>
+{% endblock content %}

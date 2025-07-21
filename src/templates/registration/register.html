@@ -1,0 +1,416 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Register - TweetNow{% endblock title %}
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
+    <div class="row w-100 justify-content-center">
+        <div class="col-12 col-md-6 col-lg-4">
+            <!-- Registration Card -->
+            <div class="card border-0 shadow-lg animate-fade-in" style="border-radius: 20px; overflow: hidden;">
+                <div class="card-header bg-gradient text-center py-4" style="background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-hover) 100%);">
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="logo-container mb-3">
+                            <i class="fab fa-twitter text-white" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h2 class="text-white fw-bold mb-0">Join TweetNow</h2>
+                        <p class="text-white-50 mb-0">Create your account and start tweeting</p>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    <!-- Registration Form -->
+                    <form id="registerForm" method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        
+                        <!-- Username Field -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="fas fa-user me-2 text-primary"></i>Username
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="username" name="username" required 
+                                   style="border-radius: 15px; border: 2px solid var(--bs-border-color); transition: all 0.3s ease;"
+                                   placeholder="Choose a unique username">
+                            <div class="invalid-feedback">
+                                Please choose a username.
+                            </div>
+                            <small class="form-text text-muted">Your username will be visible to other users.</small>
+                        </div>
+                        
+                        <!-- Email Field -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label fw-semibold">
+                                <i class="fas fa-envelope me-2 text-primary"></i>Email Address
+                            </label>
+                            <input type="email" class="form-control form-control-lg" id="email" name="email" required
+                                   style="border-radius: 15px; border: 2px solid var(--bs-border-color); transition: all 0.3s ease;"
+                                   placeholder="Enter your email address">
+                            <div class="invalid-feedback">
+                                Please provide a valid email address.
+                            </div>
+                        </div>
+                        
+                        <!-- First Name -->
+                        <div class="mb-3">
+                            <label for="firstName" class="form-label fw-semibold">
+                                <i class="fas fa-user-tag me-2 text-primary"></i>First Name
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="firstName" name="first_name" required
+                                   style="border-radius: 15px; border: 2px solid var(--bs-border-color); transition: all 0.3s ease;"
+                                   placeholder="Enter your first name">
+                            <div class="invalid-feedback">
+                                Please provide your first name.
+                            </div>
+                        </div>
+                        
+                        <!-- Last Name -->
+                        <div class="mb-3">
+                            <label for="lastName" class="form-label fw-semibold">
+                                <i class="fas fa-user-tag me-2 text-primary"></i>Last Name
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="lastName" name="last_name" required
+                                   style="border-radius: 15px; border: 2px solid var(--bs-border-color); transition: all 0.3s ease;"
+                                   placeholder="Enter your last name">
+                            <div class="invalid-feedback">
+                                Please provide your last name.
+                            </div>
+                        </div>
+                        
+                        <!-- Password Field -->
+                        <div class="mb-3">
+                            <label for="password1" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2 text-primary"></i>Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control form-control-lg" id="password1" name="password1" required
+                                       style="border-radius: 15px 0 0 15px; border: 2px solid var(--bs-border-color); transition: all 0.3s ease;"
+                                       placeholder="Create a strong password">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword1"
+                                        style="border-radius: 0 15px 15px 0; border: 2px solid var(--bs-border-color); border-left: none;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Please provide a password.
+                            </div>
+                            <small class="form-text text-muted">Password must be at least 8 characters long.</small>
+                        </div>
+                        
+                        <!-- Confirm Password Field -->
+                        <div class="mb-4">
+                            <label for="password2" class="form-label fw-semibold">
+                                <i class="fas fa-lock me-2 text-primary"></i>Confirm Password
+                            </label>
+                            <div class="input-group">
+                                <input type="password" class="form-control form-control-lg" id="password2" name="password2" required
+                                       style="border-radius: 15px 0 0 15px; border: 2px solid var(--bs-border-color); transition: all 0.3s ease;"
+                                       placeholder="Confirm your password">
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword2"
+                                        style="border-radius: 0 15px 15px 0; border: 2px solid var(--bs-border-color); border-left: none;">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="invalid-feedback">
+                                Passwords do not match.
+                            </div>
+                        </div>
+                        
+                        <!-- Terms and Conditions -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="termsCheck" required>
+                                <label class="form-check-label" for="termsCheck">
+                                    I agree to the <a href="#" class="text-primary text-decoration-none">Terms of Service</a> 
+                                    and <a href="#" class="text-primary text-decoration-none">Privacy Policy</a>
+                                </label>
+                                <div class="invalid-feedback">
+                                    You must agree to the terms and conditions.
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg py-3" id="registerBtn"
+                                    style="border-radius: 15px; font-weight: 600; transition: all 0.3s ease;">
+                                <i class="fas fa-user-plus me-2"></i>Create Account
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Card Footer -->
+                <div class="card-footer bg-transparent border-0 text-center py-4">
+                    <p class="mb-0 text-muted">Already have an account?</p>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary mt-2 px-4" 
+                       style="border-radius: 15px; font-weight: 500;">
+                        <i class="fas fa-sign-in-alt me-2"></i>Sign In
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Social Register Options -->
+            <div class="text-center mt-4">
+                <p class="text-muted mb-3">Or register with</p>
+                <div class="d-flex justify-content-center gap-3">
+                    <button class="btn btn-outline-danger" style="border-radius: 50%; width: 50px; height: 50px;">
+                        <i class="fab fa-google"></i>
+                    </button>
+                    <button class="btn btn-outline-primary" style="border-radius: 50%; width: 50px; height: 50px;">
+                        <i class="fab fa-facebook-f"></i>
+                    </button>
+                    <button class="btn btn-outline-dark" style="border-radius: 50%; width: 50px; height: 50px;">
+                        <i class="fab fa-github"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Strength Indicator -->
+<div class="modal fade" id="passwordStrengthModal" tabindex="-1">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h6 class="modal-title">Password Strength</h6>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="progress mb-2" style="height: 8px;">
+                    <div class="progress-bar" id="strengthBar" style="width: 0%"></div>
+                </div>
+                <small id="strengthText" class="text-muted">Enter a password</small>
+                <ul class="list-unstyled mt-2" id="strengthChecks">
+                    <li><i class="fas fa-times text-danger"></i> At least 8 characters</li>
+                    <li><i class="fas fa-times text-danger"></i> Contains uppercase letter</li>
+                    <li><i class="fas fa-times text-danger"></i> Contains lowercase letter</li>
+                    <li><i class="fas fa-times text-danger"></i> Contains number</li>
+                    <li><i class="fas fa-times text-danger"></i> Contains special character</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.getElementById('registerForm');
+    const password1 = document.getElementById('password1');
+    const password2 = document.getElementById('password2');
+    const registerBtn = document.getElementById('registerBtn');
+    
+    // Password toggle functionality
+    document.getElementById('togglePassword1').addEventListener('click', function() {
+        togglePasswordVisibility('password1', this);
+    });
+    
+    document.getElementById('togglePassword2').addEventListener('click', function() {
+        togglePasswordVisibility('password2', this);
+    });
+    
+    function togglePasswordVisibility(fieldId, button) {
+        const field = document.getElementById(fieldId);
+        const icon = button.querySelector('i');
+        
+        if (field.type === 'password') {
+            field.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            field.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+    
+    // Password strength checker
+    password1.addEventListener('input', function() {
+        checkPasswordStrength(this.value);
+    });
+    
+    password1.addEventListener('focus', function() {
+        const modal = new bootstrap.Modal(document.getElementById('passwordStrengthModal'));
+        modal.show();
+    });
+    
+    function checkPasswordStrength(password) {
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+        const checks = document.getElementById('strengthChecks').children;
+        
+        let score = 0;
+        const tests = [
+            password.length >= 8,
+            /[A-Z]/.test(password),
+            /[a-z]/.test(password),
+            /\d/.test(password),
+            /[^A-Za-z0-9]/.test(password)
+        ];
+        
+        tests.forEach((test, index) => {
+            const icon = checks[index].querySelector('i');
+            if (test) {
+                score++;
+                icon.classList.remove('fa-times', 'text-danger');
+                icon.classList.add('fa-check', 'text-success');
+            } else {
+                icon.classList.remove('fa-check', 'text-success');
+                icon.classList.add('fa-times', 'text-danger');
+            }
+        });
+        
+        const percentage = (score / 5) * 100;
+        strengthBar.style.width = percentage + '%';
+        
+        if (score < 2) {
+            strengthBar.className = 'progress-bar bg-danger';
+            strengthText.textContent = 'Weak';
+            strengthText.className = 'text-danger';
+        } else if (score < 4) {
+            strengthBar.className = 'progress-bar bg-warning';
+            strengthText.textContent = 'Medium';
+            strengthText.className = 'text-warning';
+        } else {
+            strengthBar.className = 'progress-bar bg-success';
+            strengthText.textContent = 'Strong';
+            strengthText.className = 'text-success';
+        }
+    }
+    
+    // Password match validation
+    password2.addEventListener('input', function() {
+        if (password1.value !== password2.value) {
+            password2.setCustomValidity('Passwords do not match');
+        } else {
+            password2.setCustomValidity('');
+        }
+    });
+    
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!form.checkValidity()) {
+            e.stopPropagation();
+            form.classList.add('was-validated');
+            return;
+        }
+        
+        setLoadingState(registerBtn, true);
+        
+        // Simulate form submission
+        setTimeout(() => {
+            setLoadingState(registerBtn, false);
+            showToast('Account created successfully! Please check your email for verification.', 'success');
+            
+            // Redirect after successful registration
+            setTimeout(() => {
+                window.location.href = '/login/';
+            }, 2000);
+        }, 2000);
+    });
+    
+    // Input field animations
+    const inputs = document.querySelectorAll('.form-control');
+    inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+            this.style.borderColor = 'var(--primary-blue)';
+            this.style.boxShadow = '0 0 0 0.2rem rgba(29, 161, 242, 0.25)';
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.borderColor = 'var(--bs-border-color)';
+            this.style.boxShadow = 'none';
+        });
+    });
+    
+    // Username availability check (mock)
+    const usernameField = document.getElementById('username');
+    let usernameTimeout;
+    
+    usernameField.addEventListener('input', function() {
+        clearTimeout(usernameTimeout);
+        const username = this.value.trim();
+        
+        if (username.length >= 3) {
+            usernameTimeout = setTimeout(() => {
+                checkUsernameAvailability(username);
+            }, 500);
+        }
+    });
+    
+    function checkUsernameAvailability(username) {
+        // Mock username availability check
+        const unavailableUsernames = ['admin', 'test', 'user', 'tweetnow'];
+        const isAvailable = !unavailableUsernames.includes(username.toLowerCase());
+        
+        const feedback = usernameField.nextElementSibling.nextElementSibling;
+        if (isAvailable) {
+            feedback.textContent = '✓ Username is available';
+            feedback.className = 'form-text text-success';
+        } else {
+            feedback.textContent = '✗ Username is already taken';
+            feedback.className = 'form-text text-danger';
+        }
+    }
+});
+</script>
+
+<style>
+.card {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95) !important;
+}
+
+[data-bs-theme="dark"] .card {
+    background: rgba(22, 27, 34, 0.95) !important;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue) !important;
+    box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25) !important;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(29, 161, 242, 0.3);
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.8s ease-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.btn-outline-primary:hover,
+.btn-outline-danger:hover,
+.btn-outline-dark:hover {
+    transform: translateY(-2px);
+    transition: all 0.3s ease;
+}
+
+.logo-container {
+    animation: pulse 2s infinite;
+}
+
+/* Custom form validation styles */
+.was-validated .form-control:invalid {
+    border-color: var(--danger-red);
+    box-shadow: 0 0 0 0.2rem rgba(249, 24, 128, 0.25);
+}
+
+.was-validated .form-control:valid {
+    border-color: var(--success-green);
+    box-shadow: 0 0 0 0.2rem rgba(0, 186, 124, 0.25);
+}
+</style>
+{% endblock extra_js %}

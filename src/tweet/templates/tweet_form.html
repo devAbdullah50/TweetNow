@@ -1,0 +1,484 @@
+{% extends 'layout.html' %}
+{% block title %}
+{% if form.instance.pk %}
+Update Tweet
+{% else %}
+Create Tweet
+{% endif %}
+ | {{ block.super }}{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <!-- Header Card -->
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body text-center py-4">
+                    <div class="d-flex align-items-center justify-content-center mb-3">
+                        <div class="tweet-icon-bg me-3">
+                            <i class="fas fa-{% if form.instance.pk %}edit{% else %}feather-alt{% endif %} text-white"></i>
+                        </div>
+                        <h2 class="card-title mb-0 fw-bold">
+                            {% if form.instance.pk %}Update Tweet{% else %}Create Tweet{% endif %}
+                        </h2>
+                    </div>
+                    <p class="text-muted mb-0">
+                        {% if form.instance.pk %}
+                            Make changes to your tweet and share your updated thoughts
+                        {% else %}
+                            What's happening? Share your thoughts with the world
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tweet Form Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <form method="post" class="tweet-form" enctype='multipart/form-data' id="tweetForm">
+                        {% csrf_token %}
+                        
+                        <!-- Custom Form Styling -->
+                        <div class="form-container">
+                            {% for field in form %}
+                                <div class="form-group mb-4">
+                                    {% if field.label %}
+                                        <label for="{{ field.id_for_label }}" class="form-label fw-semibold mb-2">
+                                            <i class="fas fa-{% if 'content' in field.name %}comment-dots{% elif 'image' in field.name %}image{% else %}tag{% endif %} me-2 text-primary"></i>
+                                            {{ field.label }}
+                                        </label>
+                                    {% endif %}
+                                    
+                                    {% if field.name == 'content' %}
+                                        <!-- Custom textarea with character counter -->
+                                        <div class="position-relative">
+                                            <textarea name="{{ field.name }}" class="form-control form-control-lg tweet-textarea" 
+                                                     id="{{ field.id_for_label }}" 
+                                                     placeholder="What's happening?"
+                                                     rows="4">{{ field.value|default:'' }}</textarea>
+                                            <div class="character-counter mt-2 text-end">
+                                                <small class="text-muted">
+                                                    <span id="charCount">0</span>/280 characters
+                                                </small>
+                                                <div class="progress mt-1" style="height: 3px;">
+                                                    <div class="progress-bar" id="charProgress" role="progressbar" style="width: 0%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% elif field.name == 'image' %}
+                                        <!-- Custom file input -->
+                                        <div class="file-upload-wrapper">
+                                            <input type="file" name="{{ field.name }}" class="form-control file-input" 
+                                                   id="{{ field.id_for_label }}" accept="image/*">
+                                            <div class="file-upload-display mt-3" id="fileDisplay">
+                                                <div class="file-preview text-center py-4">
+                                                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
+                                                    <p class="text-muted mb-0">Click to upload an image or drag & drop</p>
+                                                    <small class="text-muted">PNG, JPG, GIF up to 5MB</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        {% if field.field.widget.input_type == 'text' %}
+                                            <input type="text" name="{{ field.name }}" class="form-control" 
+                                                   id="{{ field.id_for_label }}" value="{{ field.value|default:'' }}">
+                                        {% else %}
+                                            {{ field }}
+                                        {% endif %}
+                                    {% endif %}
+                                    
+                                    {% if field.help_text %}
+                                        <div class="form-text">{{ field.help_text }}</div>
+                                    {% endif %}
+                                    
+                                    {% if field.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in field.errors %}
+                                                <i class="fas fa-exclamation-triangle me-1"></i>{{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="form-actions mt-4 pt-3 border-top">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div class="tweet-options">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2" title="Add Emoji">
+                                        <i class="fas fa-smile"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm me-2" title="Add GIF">
+                                        <i class="fas fa-gif"></i>
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" title="Add Poll">
+                                        <i class="fas fa-poll"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="submit-actions">
+                                    <button type="submit" class="btn btn-primary btn-lg px-4" id="submitBtn">
+                                        <i class="fas fa-{% if form.instance.pk %}save{% else %}paper-plane{% endif %} me-2"></i>
+                                        {% if form.instance.pk %}Update Tweet{% else %}Tweet{% endif %}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Navigation Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body text-center py-3">
+                    <a href="{% url 'tweet:tweet_list' %}" class="btn btn-outline-primary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Back to Tweets
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('tweetForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const textarea = document.querySelector('.tweet-textarea');
+    const charCount = document.getElementById('charCount');
+    const charProgress = document.getElementById('charProgress');
+    const fileInput = document.querySelector('.file-input');
+    const fileDisplay = document.getElementById('fileDisplay');
+    
+    // Character counter functionality
+    if (textarea && charCount && charProgress) {
+        function updateCharCount() {
+            const length = textarea.value.length;
+            const maxLength = 280;
+            const percentage = (length / maxLength) * 100;
+            
+            charCount.textContent = length;
+            charProgress.style.width = percentage + '%';
+            
+            // Update progress bar color based on character count
+            charProgress.className = 'progress-bar';
+            if (percentage > 90) {
+                charProgress.classList.add('bg-danger');
+            } else if (percentage > 70) {
+                charProgress.classList.add('bg-warning');
+            } else {
+                charProgress.classList.add('bg-primary');
+            }
+            
+            // Disable submit if over limit
+            submitBtn.disabled = length > maxLength;
+        }
+        
+        textarea.addEventListener('input', updateCharCount);
+        updateCharCount(); // Initial count
+        
+        // Auto-resize textarea
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    }
+    
+    // File upload click functionality
+    if (fileDisplay) {
+        fileDisplay.addEventListener('click', function() {
+            if (fileInput) {
+                fileInput.click();
+            }
+        });
+    }
+    
+    // File upload preview
+    if (fileInput && fileDisplay) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        fileDisplay.innerHTML = `
+                            <div class="file-preview-image position-relative">
+                                <img src="${e.target.result}" class="img-fluid rounded" style="max-height: 200px; object-fit: cover;">
+                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" onclick="clearFileInput()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    showToast('Please select a valid image file', 'error');
+                    fileInput.value = '';
+                }
+            }
+        });
+    }
+    
+    // Form submission with loading state
+    form.addEventListener('submit', function(e) {
+        setLoadingState(submitBtn, true);
+        
+        // Simulate form validation
+        const formData = new FormData(form);
+        const content = formData.get('text');
+        
+        if (!content || content.trim().length === 0) {
+            e.preventDefault();
+            setLoadingState(submitBtn, false);
+            showToast('Tweet content is required', 'error');
+            textarea.focus();
+            return;
+        }
+        
+        if (content.length > 280) {
+            e.preventDefault();
+            setLoadingState(submitBtn, false);
+            showToast('Tweet is too long. Maximum 280 characters allowed.', 'error');
+            textarea.focus();
+            return;
+        }
+    });
+    
+    // Drag and drop functionality
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        fileDisplay.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        fileDisplay.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        fileDisplay.addEventListener(eventName, unhighlight, false);
+    });
+    
+    fileDisplay.addEventListener('drop', handleDrop, false);
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    function highlight(e) {
+        fileDisplay.classList.add('drag-over');
+    }
+    
+    function unhighlight(e) {
+        fileDisplay.classList.remove('drag-over');
+    }
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            fileInput.files = files;
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        }
+    }
+});
+
+// Clear file input function
+function clearFileInput() {
+    const fileInput = document.querySelector('.file-input');
+    const fileDisplay = document.getElementById('fileDisplay');
+    
+    fileInput.value = '';
+    fileDisplay.innerHTML = `
+        <div class="file-preview text-center py-4">
+            <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-2"></i>
+            <p class="text-muted mb-0">Click to upload an image or drag & drop</p>
+            <small class="text-muted">PNG, JPG, GIF up to 5MB</small>
+        </div>
+    `;
+}
+</script>
+
+<style>
+.tweet-icon-bg {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-hover));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: var(--shadow-md);
+}
+
+.tweet-textarea {
+    min-height: 120px !important;
+    resize: none;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    font-size: 18px;
+    line-height: 1.4;
+}
+
+.tweet-textarea:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+}
+
+.character-counter .progress {
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.character-counter .progress-bar {
+    transition: all 0.3s ease;
+}
+
+.file-upload-wrapper {
+    position: relative;
+}
+
+.file-input {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+}
+
+.file-upload-display {
+    border: 2px dashed var(--bs-border-color);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.file-upload-display:hover,
+.file-upload-display.drag-over {
+    border-color: var(--primary-blue);
+    background: rgba(29, 161, 242, 0.05);
+}
+
+.file-preview-image img {
+    border-radius: 8px;
+}
+
+.form-actions {
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    margin: 0 -1.5rem -1.5rem -1.5rem;
+    padding: 1rem 1.5rem;
+    border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
+}
+
+.tweet-options .btn {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.tweet-options .btn:hover {
+    transform: scale(1.1);
+}
+
+.submit-actions .btn {
+    font-weight: 600;
+    border-radius: 25px;
+    padding: 0.75rem 2rem;
+    transition: all 0.3s ease;
+}
+
+.submit-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.submit-actions .btn:disabled {
+    transform: none;
+    opacity: 0.6;
+}
+
+/* Dark theme specific styles */
+[data-bs-theme="dark"] .file-upload-display {
+    border-color: var(--dark-border);
+}
+
+[data-bs-theme="dark"] .file-upload-display:hover,
+[data-bs-theme="dark"] .file-upload-display.drag-over {
+    border-color: var(--primary-blue);
+    background: rgba(29, 161, 242, 0.1);
+}
+
+[data-bs-theme="dark"] .form-actions {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* Animation classes */
+.animate-slide-up {
+    animation: slideUp 0.6s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom form field styling */
+.form-group label {
+    color: var(--bs-body-color);
+    font-size: 0.95rem;
+}
+
+.form-control {
+    border-radius: 8px;
+    border: 2px solid var(--bs-border-color);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+}
+
+.invalid-feedback {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-actions {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .tweet-options {
+        justify-content: center;
+    }
+    
+    .submit-actions {
+        text-align: center;
+    }
+    
+    .submit-actions .btn {
+        width: 100%;
+    }
+}
+</style>
+{% endblock extra_js %}

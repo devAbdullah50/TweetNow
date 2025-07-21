@@ -1,0 +1,447 @@
+{% extends 'layout.html' %}
+{% block title %}Delete | {{ tweet.text|slice:":20" }} | {{ block.super }}{% endblock title %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8 col-sm-10">
+            <!-- Alert Header Card -->
+            <div class="card border-0 shadow-sm mb-4 alert-card">
+                <div class="card-body text-center py-5">
+                    <div class="alert-icon mb-4">
+                        <div class="danger-icon-bg">
+                            <i class="fas fa-exclamation-triangle text-white"></i>
+                        </div>
+                    </div>
+                    
+                    <h2 class="card-title fw-bold mb-3 text-danger">
+                        <i class="fas fa-trash-alt me-2"></i>
+                        Delete Tweet
+                    </h2>
+                    
+                    <p class="lead text-muted mb-0">
+                        This action cannot be undone. Your tweet will be permanently removed.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tweet Preview Card -->
+            <div class="card border-0 shadow-sm mb-4 tweet-preview-card">
+                <div class="card-header bg-transparent border-bottom-0 pb-2">
+                    <h5 class="card-title mb-0 text-muted">
+                        <i class="fas fa-eye me-2"></i>
+                        Tweet to be deleted:
+                    </h5>
+                </div>
+                <div class="card-body pt-2">
+                    <div class="tweet-content p-4 rounded">
+                        <div class="d-flex align-items-start">
+                            <div class="tweet-avatar me-3">
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <div class="tweet-text flex-grow-1">
+                                <div class="tweet-header mb-2">
+                                    <span class="fw-semibold">{{ user.username|default:"You" }}</span>
+                                    <span class="text-muted ms-2">
+                                        <i class="fas fa-clock me-1"></i>
+                                        {{ tweet.created_at|timesince }} ago
+                                    </span>
+                                </div>
+                                <p class="tweet-body mb-0">{{ tweet.text }}</p>
+                                
+                                {% if tweet.image %}
+                                <div class="tweet-image mt-3">
+                                    <img src="{{ tweet.image.url }}" alt="Tweet image" 
+                                         class="img-fluid rounded" style="max-height: 200px; object-fit: cover;">
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Card -->
+            <div class="card border-0 shadow-sm mb-4 confirmation-card">
+                <div class="card-body p-4">
+                    <div class="confirmation-content text-center">
+                        <h4 class="fw-bold mb-3">
+                            Are you absolutely sure?
+                        </h4>
+                        
+                        <p class="text-muted mb-4">
+                            Once you delete this tweet, there is no going back. Please be certain before proceeding.
+                        </p>
+                        
+                        <!-- Warning List -->
+                        <div class="warning-list text-start mb-4">
+                            <div class="alert alert-warning border-0" role="alert">
+                                <h6 class="alert-heading mb-2">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    What will happen:
+                                </h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li class="mb-1">
+                                        <i class="fas fa-times text-danger me-2"></i>
+                                        The tweet will be permanently deleted
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="fas fa-times text-danger me-2"></i>
+                                        All likes and retweets will be lost
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="fas fa-times text-danger me-2"></i>
+                                        Any attached media will be removed
+                                    </li>
+                                    <li>
+                                        <i class="fas fa-times text-danger me-2"></i>
+                                        This action cannot be undone
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons Card -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div class="action-buttons">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <form method="POST" id="deleteForm" class="w-100">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger btn-lg w-100 delete-btn" type="submit" id="deleteBtn">
+                                        <i class="fas fa-trash-alt me-2"></i>
+                                        <span class="btn-text">Yes, Delete Tweet</span>
+                                    </button>
+                                </form>
+                            </div>
+                            <div class="col-md-6">
+                                <a class="btn btn-outline-primary btn-lg w-100 cancel-btn" 
+                                   href="{% url 'tweet:tweet_list' %}">
+                                    <i class="fas fa-arrow-left me-2"></i>
+                                    Cancel & Go Back
+                                </a>
+                            </div>
+                        </div>
+                        
+                        <!-- Quick Navigation -->
+                        <div class="quick-nav mt-4 pt-3 border-top text-center">
+                            <small class="text-muted">Or return to:</small>
+                            <div class="nav-links mt-2">
+                                <a href="{% url 'tweet:tweet_list' %}" class="btn btn-sm btn-outline-secondary me-2">
+                                    <i class="fas fa-home me-1"></i>
+                                    Home
+                                </a>
+                                <a href="{% url 'tweet:tweet_list' %}" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-user me-1"></i>
+                                    Profile
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteForm = document.getElementById('deleteForm');
+    const deleteBtn = document.getElementById('deleteBtn');
+    let confirmationCount = 0;
+    
+    // Double confirmation for delete
+    deleteForm.addEventListener('submit', function(e) {
+        if (confirmationCount === 0) {
+            e.preventDefault();
+            confirmationCount++;
+            
+            // Change button text and style for second confirmation
+            deleteBtn.classList.remove('btn-danger');
+            deleteBtn.classList.add('btn-warning');
+            deleteBtn.innerHTML = `
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span class="btn-text">Click Again to Confirm</span>
+            `;
+            
+            // Add shake animation
+            deleteBtn.classList.add('shake');
+            setTimeout(() => {
+                deleteBtn.classList.remove('shake');
+            }, 600);
+            
+            // Show toast warning
+            showToast('Click the button again to confirm deletion', 'warning');
+            
+            // Reset after 5 seconds if no action
+            setTimeout(() => {
+                if (confirmationCount === 1) {
+                    resetDeleteButton();
+                }
+            }, 5000);
+            
+            return false;
+        } else {
+            // Second click - proceed with deletion
+            setLoadingState(deleteBtn, true);
+            deleteBtn.innerHTML = `
+                <span class="loading-spinner me-2"></span>
+                Deleting Tweet...
+            `;
+            showToast('Deleting your tweet...', 'info');
+        }
+    });
+    
+    function resetDeleteButton() {
+        confirmationCount = 0;
+        deleteBtn.classList.remove('btn-warning');
+        deleteBtn.classList.add('btn-danger');
+        deleteBtn.innerHTML = `
+            <i class="fas fa-trash-alt me-2"></i>
+            <span class="btn-text">Yes, Delete Tweet</span>
+        `;
+    }
+    
+    // Add hover effects
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // ESC key to cancel
+        if (e.key === 'Escape') {
+            window.location.href = "{% url 'tweet:tweet_list' %}";
+        }
+        
+        // Enter key to delete (with confirmation)
+        if (e.key === 'Enter' && e.ctrlKey) {
+            deleteForm.dispatchEvent(new Event('submit'));
+        }
+    });
+    
+    // Auto-focus on page load
+    setTimeout(() => {
+        document.querySelector('.cancel-btn').focus();
+    }, 300);
+});
+</script>
+
+<style>
+/* Alert Card Styles */
+.alert-card {
+    background: linear-gradient(135deg, rgba(248, 249, 250, 0.8), rgba(255, 255, 255, 0.9));
+    border: 1px solid rgba(220, 53, 69, 0.1);
+}
+
+[data-bs-theme="dark"] .alert-card {
+    background: linear-gradient(135deg, rgba(22, 27, 34, 0.8), rgba(33, 38, 45, 0.9));
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.danger-icon-bg {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(45deg, #dc3545, #c82333);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto;
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    animation: pulse-danger 2s infinite;
+}
+
+@keyframes pulse-danger {
+    0% {
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    }
+    50% {
+        box-shadow: 0 8px 35px rgba(220, 53, 69, 0.5);
+        transform: scale(1.05);
+    }
+    100% {
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    }
+}
+
+/* Tweet Preview Styles */
+.tweet-preview-card {
+    border-left: 4px solid var(--danger-red);
+}
+
+.tweet-content {
+    background: rgba(220, 53, 69, 0.05);
+    border: 1px solid rgba(220, 53, 69, 0.1);
+}
+
+[data-bs-theme="dark"] .tweet-content {
+    background: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+.avatar-placeholder {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-hover));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.tweet-header {
+    font-size: 0.9rem;
+}
+
+.tweet-body {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--bs-body-color);
+}
+
+/* Confirmation Card Styles */
+.confirmation-card {
+    border-top: 3px solid var(--warning-yellow);
+}
+
+.warning-list .alert {
+    background: rgba(255, 173, 31, 0.1);
+    border-left: 4px solid var(--warning-yellow);
+}
+
+/* Button Styles */
+.delete-btn {
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.delete-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+}
+
+.delete-btn.shake {
+    animation: shake 0.6s ease-in-out;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.cancel-btn {
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.cancel-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    background: var(--primary-blue);
+    color: white;
+}
+
+/* Card Hover Effects */
+.card {
+    transition: all 0.3s ease;
+    cursor: default;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Quick Navigation */
+.quick-nav .nav-links .btn {
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.quick-nav .nav-links .btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Loading State */
+.loading-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .danger-icon-bg {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .tweet-content {
+        padding: 1rem !important;
+    }
+    
+    .avatar-placeholder {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+    }
+    
+    .action-buttons .row {
+        flex-direction: column-reverse;
+    }
+}
+
+/* Focus States */
+.btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.5) !important;
+}
+
+.delete-btn:focus {
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.5) !important;
+}
+
+/* Animation Classes */
+.animate-slide-in {
+    animation: slideIn 0.6s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock extra_js %}

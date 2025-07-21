@@ -1,0 +1,565 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block title %}Tweets - TweetNow{% endblock title %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="mb-1 fw-bold">
+                        <i class="fab fa-twitter text-primary me-2"></i>Latest Tweets
+                    </h2>
+                    <p class="text-muted mb-0">Discover what's happening right now</p>
+                </div>
+                {% comment %} <div class="d-flex gap-2 flex-wrap">
+                    <!-- Search Bar -->
+                    <div class="input-group" style="width: 300px; min-width: 250px;">
+                        <input type="text" class="form-control" placeholder="Search tweets..." id="searchInput"
+                               style="border-radius: 25px 0 0 25px; border: 2px solid var(--bs-border-color);">
+                        <button class="btn btn-outline-secondary" type="button" id="searchBtn"
+                                style="border-radius: 0 25px 25px 0; border: 2px solid var(--bs-border-color); border-left: none;">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div> {% endcomment %}
+                    
+                    <!-- Create Tweet Button -->
+                    <a href="{% url 'tweet:tweet_create' %}" class="btn btn-primary btn-lg px-4 create-tweet-btn"
+                       style="border-radius: 25px; font-weight: 600; white-space: nowrap;">
+                        <i class="fas fa-plus me-2"></i>Create Tweet
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Tabs -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <ul class="nav nav-pills" id="tweetTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all" type="button">
+                        <i class="fas fa-globe me-2"></i>All Tweets
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="following-tab" data-bs-toggle="pill" data-bs-target="#following" type="button">
+                        <i class="fas fa-users me-2"></i>Following
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="trending-tab" data-bs-toggle="pill" data-bs-target="#trending" type="button">
+                        <i class="fas fa-fire me-2"></i>Trending
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Tweet Feed -->
+    <div class="row">
+        <div class="col-12">
+            <div class="tab-content" id="tweetTabContent">
+                <div class="tab-pane fade show active" id="all" role="tabpanel">
+                    <div class="tweet-container" id="tweetContainer">
+                        {% for tweet in tweets %}
+                        <div class="tweet-card mb-4 animate-fade-in" data-tweet-id="{{ tweet.id }}">
+                            <div class="card border-0 shadow-sm hover-lift" style="border-radius: 20px; overflow: hidden;">
+                                <!-- Tweet Header -->
+                                <div class="card-header bg-transparent border-0 p-4 pb-0">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-container me-3">
+                                            {% if tweet.user.profile.profile_picture %}
+                                            <img src="{{ tweet.user.profile.profile_picture.url }}" 
+                                                 class="rounded-circle" width="50" height="50" 
+                                                 alt="{{ tweet.user.username }}" style="object-fit: cover;">
+                                            {% else %}
+                                            <div class="avatar-placeholder rounded-circle d-flex align-items-center justify-content-center"
+                                                 style="width: 50px; height: 50px; background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover)); color: white; font-weight: bold; font-size: 1.2rem;">
+                                                {{ tweet.user.username|slice:":1"|upper }}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="d-flex align-items-center flex-wrap">
+                                                <h6 class="mb-0 fw-bold me-2">
+                                                    {{ tweet.user.get_full_name|default:tweet.user.username }}
+                                                </h6>
+                                                <span class="text-muted me-2">@{{ tweet.user.username }}</span>
+                                                <span class="text-muted small">·</span>
+                                                <span class="text-muted small ms-2" title="{{ tweet.created_at }}">
+                                                    {{ tweet.created_at|timesince }} ago
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Tweet Actions Dropdown -->
+                                        {% if request.user == tweet.user %}
+                                        <div class="dropdown">
+                                            <button class="btn btn-link text-muted p-1" type="button" data-bs-toggle="dropdown">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li>
+                                                    <a class="dropdown-item" href="{% url 'tweet:tweet_edit' tweet.id %}">
+                                                        <i class="fas fa-edit me-2"></i>Edit Tweet
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <form action="{% url 'tweet:tweet_delete' tweet.id %}" method="GET">
+                                                        {% comment %} {% csrf_token %} {% endcomment %}
+                                                        <button type="submit" class="dropdown-item text-danger" href="#" data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteTweetModal" data-tweet-id="{{ tweet.id }}">
+                                                        <i class="fas fa-trash me-2"></i>Delete Tweet
+                                                    </button>
+                                                </form>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Tweet Content -->
+                                <div class="card-body p-4 pt-2">
+                                    <!-- Tweet Text -->
+                                    <div class="tweet-text mb-3">
+                                        <p class="mb-0" style="line-height: 1.5; font-size: 1.1rem;">
+                                            {{ tweet.text }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Tweet Image -->
+                                    {% if tweet.photo %}
+                                    <div class="tweet-image mb-3">
+                                        <img src="{{ tweet.photo.url }}" class="img-fluid rounded-3 w-100" 
+                                             alt="Tweet image" style="max-height: 400px; object-fit: cover; cursor: pointer;"
+                                             data-bs-toggle="modal" data-bs-target="#imageModal" 
+                                             data-src="{{ tweet.photo.url }}">
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Tweet Stats & Actions -->
+                                    <div class="tweet-actions d-flex justify-content-between align-items-center pt-3 border-top">
+                                        <div class="d-flex gap-4">
+                                            <!-- Like Button -->
+                                            <button class="btn btn-link text-muted p-0 like-btn" data-tweet-id="{{ tweet.id }}">
+                                                <i class="far fa-heart me-1"></i>
+                                                <span class="like-count">{{ tweet.likes_count|default:0 }}</span>
+                                            </button>
+                                            
+                                            <!-- Comment Button -->
+                                            <button class="btn btn-link text-muted p-0" data-bs-toggle="collapse" 
+                                                    data-bs-target="#comments-{{ tweet.id }}">
+                                                <i class="far fa-comment me-1"></i>
+                                                <span>{{ tweet.comments_count|default:0 }}</span>
+                                            </button>
+                                            
+                                            <!-- Retweet Button -->
+                                            <button class="btn btn-link text-muted p-0 retweet-btn" data-tweet-id="{{ tweet.id }}">
+                                                <i class="fas fa-retweet me-1"></i>
+                                                <span class="retweet-count">{{ tweet.retweets_count|default:0 }}</span>
+                                            </button>
+                                            
+                                            <!-- Share Button -->
+                                            <button class="btn btn-link text-muted p-0 share-btn" data-tweet-id="{{ tweet.id }}">
+                                                <i class="fas fa-share me-1"></i>
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Read More Button -->
+                                        <a href="#" class="btn btn-outline-primary btn-sm"
+                                           style="border-radius: 15px;">
+                                            <i class="fas fa-eye me-1"></i>View Details
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Comments Section (Collapsible) -->
+                                <div class="collapse" id="comments-{{ tweet.id }}">
+                                    <div class="card-footer bg-transparent border-0 pt-0">
+                                        <div class="comments-section p-3" style="background: var(--bs-gray-100); border-radius: 15px;">
+                                            <h6 class="mb-3">Comments</h6>
+                                            <div class="comment-form mb-3">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control" placeholder="Write a comment..."
+                                                           style="border-radius: 20px 0 0 20px;">
+                                                    <button class="btn btn-primary" type="button"
+                                                            style="border-radius: 0 20px 20px 0;">
+                                                        <i class="fas fa-paper-plane"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="comments-list">
+                                                <p class="text-muted small mb-0">
+                                                    <i class="fas fa-comments me-1"></i>Be the first to comment
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <!-- Empty State -->
+                        <div class="text-center py-5">
+                            <div class="empty-state">
+                                <i class="fab fa-twitter text-muted mb-3" style="font-size: 4rem;"></i>
+                                <h4 class="text-muted mb-3">No Tweets Yet</h4>
+                                <p class="text-muted mb-4">Be the first to share what's on your mind!</p>
+                                <a href="{% url 'tweet:tweet_create' %}" class="btn btn-primary btn-lg"
+                                   style="border-radius: 25px;">
+                                    <i class="fas fa-plus me-2"></i>Create Your First Tweet
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Load More Button -->
+                    {% if tweets %}
+                    <div class="text-center mt-4">
+                        <button class="btn btn-outline-primary btn-lg" id="loadMoreBtn"
+                                style="border-radius: 25px; border-width: 2px;">
+                            <i class="fas fa-plus me-2"></i>Load More Tweets
+                        </button>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Other tab content (Following, Trending) -->
+                <div class="tab-pane fade" id="following" role="tabpanel">
+                    <div class="text-center py-5">
+                        <i class="fas fa-users text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5>Following Feed</h5>
+                        <p class="text-muted">See tweets from people you follow</p>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="trending" role="tabpanel">
+                    <div class="text-center py-5">
+                        <i class="fas fa-fire text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h5>Trending Now</h5>
+                        <p class="text-muted">Most popular tweets today</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Tweet Modal -->
+{% comment %} <div class="modal fade" id="deleteTweetModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content" style="border-radius: 20px;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>Delete Tweet
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this tweet? This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                        style="border-radius: 15px;">Cancel</button>
+                <a href="#" class="btn btn-danger" id="confirmDeleteBtn"
+                   style="border-radius: 15px;">
+                    <i class="fas fa-trash me-2"></i>Delete Tweet
+                </a>
+            </div>
+        </div>
+    </div>
+</div> {% endcomment %}
+
+<!-- Image Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" 
+                        data-bs-dismiss="modal" style="z-index: 1000;"></button>
+                <img src="" class="img-fluid rounded-3 w-100" alt="Tweet image" id="modalImage">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    const searchBtn = document.getElementById('searchBtn');
+    const tweetContainer = document.getElementById('tweetContainer');
+    
+    searchBtn.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+    
+    function performSearch() {
+        const query = searchInput.value.trim();
+        if (query) {
+            // Implement search functionality
+            showToast(`Searching for: "${query}"`, 'info');
+            // Here you would typically make an AJAX call to search tweets
+        }
+    }
+    
+    // Like button functionality
+    document.querySelectorAll('.like-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tweetId = this.dataset.tweetId;
+            const icon = this.querySelector('i');
+            const count = this.querySelector('.like-count');
+            const currentCount = parseInt(count.textContent) || 0;
+            
+            if (icon.classList.contains('far')) {
+                // Like the tweet
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                icon.style.color = '#e91e63';
+                count.textContent = currentCount + 1;
+                this.style.color = '#e91e63';
+                
+                // Add animation
+                icon.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    icon.style.transform = 'scale(1)';
+                }, 200);
+            } else {
+                // Unlike the tweet
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                icon.style.color = '';
+                count.textContent = Math.max(0, currentCount - 1);
+                this.style.color = '';
+            }
+        });
+    });
+    
+    // Retweet button functionality
+    document.querySelectorAll('.retweet-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tweetId = this.dataset.tweetId;
+            const icon = this.querySelector('i');
+            const count = this.querySelector('.retweet-count');
+            const currentCount = parseInt(count.textContent) || 0;
+            
+            if (this.style.color !== 'rgb(29, 161, 242)') {
+                this.style.color = 'rgb(29, 161, 242)';
+                count.textContent = currentCount + 1;
+                
+                // Add animation
+                icon.style.transform = 'rotate(180deg)';
+                setTimeout(() => {
+                    icon.style.transform = 'rotate(0deg)';
+                }, 300);
+                
+                showToast('Tweet retweeted!', 'success');
+            }
+        });
+    });
+    
+    // Share button functionality
+    document.querySelectorAll('.share-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const tweetId = this.dataset.tweetId;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'TweetNow',
+                    text: 'Check out this tweet!',
+                    url: window.location.href + '#tweet-' + tweetId,
+                });
+            } else {
+                // Fallback - copy to clipboard
+                const url = window.location.href + '#tweet-' + tweetId;
+                navigator.clipboard.writeText(url).then(() => {
+                    showToast('Tweet link copied to clipboard!', 'success');
+                });
+            }
+        });
+    });
+    
+    // Delete tweet modal
+    const deleteTweetModal = document.getElementById('deleteTweetModal');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    
+    {% comment %} deleteTweetModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const tweetId = button.getAttribute('data-tweet-id');
+        confirmDeleteBtn.href = `/tweet/${tweetId}/delete/`;
+        
+    }); {% endcomment %}
+    
+    // Image modal
+    const imageModal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    
+    document.querySelectorAll('[data-bs-target="#imageModal"]').forEach(img => {
+        img.addEventListener('click', function() {
+            modalImage.src = this.dataset.src || this.src;
+        });
+    });
+    
+    // Load more tweets
+    const loadMoreBtn = document.getElementById('loadMoreBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', function() {
+            setLoadingState(this, true);
+            
+            setTimeout(() => {
+                setLoadingState(this, false);
+                showToast('No more tweets to load', 'info');
+            }, 1500);
+        });
+    }
+    
+    // Infinite scroll
+    let isLoading = false;
+    window.addEventListener('scroll', function() {
+        if (isLoading) return;
+        
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000) {
+            isLoading = true;
+            
+            setTimeout(() => {
+                isLoading = false;
+                // Load more tweets here
+            }, 1000);
+        }
+    });
+    
+    // Tweet card hover effects
+    document.querySelectorAll('.tweet-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+});
+</script>
+
+<style>
+.hover-lift {
+    transition: all 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+}
+
+.create-tweet-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(29, 161, 242, 0.3);
+}
+
+.tweet-actions button {
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+}
+
+.tweet-actions button:hover {
+    transform: scale(1.1);
+}
+
+.like-btn:hover {
+    color: #e91e63 !important;
+}
+
+.retweet-btn:hover {
+    color: #00ba7c !important;
+}
+
+.share-btn:hover {
+    color: var(--primary-blue) !important;
+}
+
+.nav-pills .nav-link {
+    border-radius: 25px;
+    font-weight: 500;
+    color: var(--bs-body-color);
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-pills .nav-link.active {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.nav-pills .nav-link:not(.active):hover {
+    background-color: rgba(29, 161, 242, 0.1);
+    border-color: var(--primary-blue);
+    color: var(--primary-blue);
+}
+
+.avatar-placeholder {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-hover)) !important;
+}
+
+.tweet-text {
+    word-wrap: break-word;
+}
+
+.tweet-image img {
+    transition: all 0.3s ease;
+}
+
+.tweet-image img:hover {
+    transform: scale(1.02);
+}
+
+.empty-state i {
+    animation: pulse 2s infinite;
+}
+
+.comments-section {
+    background: var(--light-bg-secondary) !important;
+}
+
+[data-bs-theme="dark"] .comments-section {
+    background: var(--dark-bg-secondary) !important;
+}
+
+@media (max-width: 768px) {
+    .tweet-actions {
+        flex-wrap: wrap;
+        gap: 1rem !important;
+    }
+    
+    .tweet-actions > div {
+        gap: 1rem !important;
+    }
+}
+
+.animate-fade-in {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+{% endblock extra_js %}

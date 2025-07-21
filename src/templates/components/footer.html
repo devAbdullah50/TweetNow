@@ -1,0 +1,387 @@
+{% load static %}
+
+<footer class="site-footer mt-5">
+    <div class="footer-content">
+        <div class="container">
+            <div class="row g-4">
+                <!-- Brand Section -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="footer-brand">
+                        <h5 class="brand-title">
+                            <i class="fas fa-bird me-2"></i>
+                            TweetNow
+                        </h5>
+                        <p class="brand-description">
+                            Share your thoughts instantly with the world. Connect, engage, and express yourself in real-time.
+                        </p>
+                        <div class="social-links">
+                            <a href="#" class="social-link" title="Twitter">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Facebook">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                            <a href="#" class="social-link" title="Instagram">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <a href="#" class="social-link" title="LinkedIn">
+                                <i class="fab fa-linkedin"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Links -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Platform</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Home</a></li>
+                            <li><a href="#">Explore</a></li>
+                            <li><a href="#">Trending</a></li>
+                            <li><a href="#">Notifications</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Resources -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Resources</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Help Center</a></li>
+                            <li><a href="#">API Docs</a></li>
+                            <li><a href="#">Blog</a></li>
+                            <li><a href="#">Status</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Company -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Company</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">About</a></li>
+                            <li><a href="#">Careers</a></li>
+                            <li><a href="#">Press</a></li>
+                            <li><a href="#">Contact</a></li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Newsletter -->
+                <div class="col-lg-2 col-md-6 col-sm-6">
+                    <div class="footer-section">
+                        <h6 class="footer-title">Stay Updated</h6>
+                        <p class="newsletter-text">Get the latest updates and news.</p>
+                        <div class="newsletter-form">
+                            <div class="input-group input-group-sm">
+                                <input type="email" class="form-control" placeholder="Your email" aria-label="Email">
+                                <button class="btn btn-primary" type="button" title="Subscribe">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="copyright-text">
+                            &copy; 2025 TweetNow. All rights reserved.
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <ul class="footer-legal">
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                            <li><a href="#">Cookie Policy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Decorative Wave -->
+    <div class="footer-wave">
+        <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,64C960,75,1056,85,1152,80C1248,75,1344,53,1392,42.7L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
+        </svg>
+    </div>
+</footer>
+
+<style>
+.site-footer {
+    position: relative;
+    margin-top: auto;
+    overflow: hidden;
+}
+
+.footer-content {
+    position: relative;
+    z-index: 2;
+    padding: 60px 0 30px;
+}
+
+/* Light Theme Footer */
+[data-bs-theme="light"] .site-footer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+[data-bs-theme="light"] .footer-wave path {
+    fill: #f8f9fa;
+    opacity: 0.1;
+}
+
+/* Dark Theme Footer */
+[data-bs-theme="dark"] .site-footer {
+    background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    color: var(--dark-text);
+}
+
+[data-bs-theme="dark"] .footer-wave path {
+    fill: #21262d;
+    opacity: 0.1;
+}
+
+.footer-wave {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.footer-wave svg {
+    position: relative;
+    display: block;
+    width: calc(100% + 1.3px);
+    height: 60px;
+    transform: rotateY(180deg);
+}
+
+/* Brand Section */
+.footer-brand .brand-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #fff, #e2e8f0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.brand-description {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+/* Social Links */
+.social-links {
+    display: flex;
+    gap: 12px;
+}
+
+.social-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 50%;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.social-link:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Footer Sections */
+.footer-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1.2rem;
+    color: white;
+    position: relative;
+}
+
+.footer-title::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-hover));
+    border-radius: 1px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 8px;
+}
+
+.footer-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.footer-links a:hover {
+    color: white;
+    padding-left: 8px;
+}
+
+.footer-links a::before {
+    content: '';
+    position: absolute;
+    left: -8px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 1px;
+    background: var(--primary-blue);
+    transition: width 0.3s ease;
+}
+
+.footer-links a:hover::before {
+    width: 4px;
+}
+
+/* Newsletter Section */
+.newsletter-text {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    margin-bottom: 1rem;
+}
+
+.newsletter-form .form-control {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    backdrop-filter: blur(10px);
+}
+
+.newsletter-form .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.newsletter-form .form-control:focus {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(29, 161, 242, 0.25);
+    color: white;
+}
+
+.newsletter-form .btn-primary {
+    background: linear-gradient(45deg, var(--primary-blue), var(--primary-blue-hover));
+    border: none;
+    border-radius: 0 4px 4px 0;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 30px;
+    margin-top: 40px;
+}
+
+.copyright-text {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.footer-legal {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.footer-legal a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.3s ease;
+}
+
+.footer-legal a:hover {
+    color: white;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .footer-content {
+        padding: 40px 0 20px;
+    }
+    
+    .footer-legal {
+        justify-content: center;
+        margin-top: 15px;
+        gap: 15px;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+    
+    .footer-brand {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .footer-section {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+}
+
+/* Animation for footer elements */
+.footer-section {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: footerFadeIn 0.8s ease-out forwards;
+}
+
+.footer-section:nth-child(1) { animation-delay: 0.1s; }
+.footer-section:nth-child(2) { animation-delay: 0.2s; }
+.footer-section:nth-child(3) { animation-delay: 0.3s; }
+.footer-section:nth-child(4) { animation-delay: 0.4s; }
+.footer-section:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes footerFadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
