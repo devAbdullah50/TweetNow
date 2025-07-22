@@ -73,20 +73,21 @@ WSGI_APPLICATION = 'TweetNow.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Use PostgreSQL in production, SQLite in development
-if os.environ.get('VERCEL'):
-    # Use in-memory SQLite for Vercel (data won't persist)
+if 'DATABASE_URL' in os.environ:
+    # Production database (PostgreSQL)
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': ':memory:',
-        }
+        'default': dj_database_url.parse(os.environ.get('DATABASE_URL'))
     }
 else:
-    # Local development
+    # Development database (you can use PostgreSQL locally too)
     DATABASES = {
         'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'your_local_db_name',
+            'USER': 'your_local_db_user',
+            'PASSWORD': 'your_local_db_password',
+            'HOST': 'localhost',
+            'PORT': '5432',
         }
     }
 # Password validation
